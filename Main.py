@@ -84,3 +84,4 @@ def extract_keypoints(results):
 
 # print(rh)
 # print(extract_keypoints(results).shape) => (1662,)
+
