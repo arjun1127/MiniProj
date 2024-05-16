@@ -81,7 +81,5 @@ def extract_keypoints(results):
     # for slr concatenate all the keypoints
     return np.concatenate([pose, face, lh, rh])
 
-
 # print(rh)
 # print(extract_keypoints(results).shape) => (1662,)
-
