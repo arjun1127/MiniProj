@@ -39,27 +39,6 @@ def draw_landmarks(image, results):
                               )
 
 
-# to capture the video by frames we have set up a loop
-
-cap = cv2.VideoCapture(0)
-with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
-    while cap.isOpened():
-        # to read the frame
-        ret, frame = cap.read()
-        # make detection
-        image, results = mediapipe_detection(frame, holistic)
-        print(results)
-        draw_landmarks(image, results)
-        # to show the popup window and the img keeps on processing till while is true
-        cv2.imshow('OpenCv Feed', image)
-        # quit the pop-up as u press 'q'
-        if cv2.waitKey(10) & 0xFF == ord('q'):
-            break
-
-cap.release()
-cv2.destroyAllWindows()
-
-
 # see results using results.face_landmark.Landmark or and landmarks left hand or right hand
 # results.landmarks for each face, pose, hands has its set of parameters x,y,z
 
@@ -81,5 +60,85 @@ def extract_keypoints(results):
     # for slr concatenate all the keypoints
     return np.concatenate([pose, face, lh, rh])
 
+
 # print(rh)
 # print(extract_keypoints(results).shape) => (1662,)
+
+# Path for exported data from the numpy array
+DATA_PATH = os.path.join('MP_DATA')
+# Actions that we try to detect
+actions = np.array(['hello', 'thanks', 'iloveYou'])
+# Thirty videos worth of data
+no_sequences = 30
+# videos are going to be 30 frames in length
+sequence_length = 30
+
+# MP_DATA/
+# ├── hello/
+# │   ├── seq_01/
+# │   │   ├── 0.npy
+# │   │   ├── 1.npy
+# │   │   └── ...
+# │   ├── seq_02/
+# │   └── ...
+# ├── thanks/
+# │   ├── seq_01/
+# │   └── ...
+# └── iloveYou/
+#     ├── seq_01/
+#     └── ...
+
+for action in actions:
+    for sequence in range(no_sequences):
+        try:
+            os.makedirs(os.path.join(DATA_PATH, action, str(sequence)))
+        except:
+            pass
+
+# to capture the video by frames we have set up a loop
+
+cap = cv2.VideoCapture(0)
+with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+    for action in actions:
+        for sequence in range(no_sequences):
+            for frame_num in range(sequence_length):
+                # Read the frame
+                ret, frame = cap.read()
+                if not ret:
+                    break
+
+                # Make detection
+                image, results = mediapipe_detection(frame, holistic)
+                print(results)
+                draw_landmarks(image, results)
+
+                # Apply collection break for hand movement break
+                if frame_num == 0:
+                    cv2.putText(image, 'STARTING COLLECTION', (120, 200),
+                                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4, cv2.LINE_AA)
+                    cv2.putText(image, 'Collecting frames for {} video number {}'.format(action, sequence), (15, 12),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 4, cv2.LINE_AA)
+                    # Pause for 2 seconds
+                    cv2.waitKey(2000)
+                else:
+                    cv2.putText(image, 'Collecting frames for {} video number {}'.format(action, sequence), (15, 12),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 4, cv2.LINE_AA)
+
+                # Show the popup window and the img keeps on processing till while is true
+                cv2.imshow('OpenCv Feed', image)
+
+                # Quit the pop-up as you press 'q'
+                if cv2.waitKey(10) & 0xFF == ord('q'):
+                    cap.release()
+                    cv2.destroyAllWindows()
+                    break
+            else:
+                continue
+            break
+        else:
+            continue
+        break
+
+result_test = extract_keypoints(results)
+np.save('0', result_test)
+
