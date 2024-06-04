@@ -67,7 +67,7 @@ def extract_keypoints(results):
 # Path for exported data from the numpy array
 DATA_PATH = os.path.join('MP_DATA')
 # Actions that we try to detect
-actions = np.array(['hello', 'thanks', 'iloveYou'])
+actions = np.array(['hello', 'thanks', 'sorry', 'please', 'Bye'])
 # Thirty videos worth of data
 no_sequences = 30
 # videos are going to be 30 frames in length
@@ -114,16 +114,19 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
 
                 # Apply collection break for hand movement break
                 if frame_num == 0:
-                    cv2.putText(image, 'STARTING COLLECTION', (120, 200),
+                    cv2.putText(image, 'STARTING COLLECTION', (120, 240),
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4, cv2.LINE_AA)
                     cv2.putText(image, 'Collecting frames for {} video number {}'.format(action, sequence), (15, 12),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 4, cv2.LINE_AA)
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
                     # Pause for 2 seconds
                     cv2.waitKey(2000)
                 else:
                     cv2.putText(image, 'Collecting frames for {} video number {}'.format(action, sequence), (15, 12),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 4, cv2.LINE_AA)
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
 
+                # keypoints = extract_keypoints(results)
+                # npy_path = os.path.join(DATA_PATH, action, str(sequence), str(frame_num))
+                # np.save(npy_path, keypoints)
                 # Show the popup window and the img keeps on processing till while is true
                 cv2.imshow('OpenCv Feed', image)
 
@@ -141,4 +144,4 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
 
 result_test = extract_keypoints(results)
 np.save('0', result_test)
-
+np.load('0.npy')
