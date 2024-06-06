@@ -1,0 +1,28 @@
+# MP_DATA/
+# ├── hello/
+# │   ├── seq_01/
+# │   │   ├── 0.npy
+# │   │   ├── 1.npy
+# │   │   └── ...
+# │   ├── seq_02/
+# │   └── ...
+# ├── thanks/
+# │   ├── seq_01/
+# │   └── ...
+# └── how are you/
+#     ├── seq_01/
+#     └── ...
+
+Why are we using this specific neural network that is media pipe + LSTM layers
+ => we can see in many of the research paper that many have used a number of CNN layers + LSTM layers or some have
+    use pre-trained mobile nets to train along with LSTM layers
+    => using this in their models was less accurate for real time sequence that we were going to collect
+    => so the main reason for using LSTM layers + Media pipe
+
+    => Fewer Data required to produce a hyperactive model
+    => Much denser Neural network rather than having millions for parameter in our neural network we have few
+    => So this NN is much faster
+
+ we have used categorical_cross-entropy loss function because we have multi class classification model so
+ =>in case we are using regression with neural network we would be using mean-square root loss function
+    if binary class classification then we would use binary cross-entropy

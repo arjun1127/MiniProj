@@ -3,8 +3,10 @@
 import cv2
 import numpy as np
 import os
+# from keras.src.utils import to_categorical
 from matplotlib import pyplot as plt
 import mediapipe as mp
+
 
 mp_holistic = mp.solutions.holistic
 mp_drawing = mp.solutions.drawing_utils
@@ -73,75 +75,72 @@ no_sequences = 30
 # videos are going to be 30 frames in length
 sequence_length = 30
 
-# MP_DATA/
-# ├── hello/
-# │   ├── seq_01/
-# │   │   ├── 0.npy
-# │   │   ├── 1.npy
-# │   │   └── ...
-# │   ├── seq_02/
-# │   └── ...
-# ├── thanks/
-# │   ├── seq_01/
-# │   └── ...
-# └── iloveYou/
-#     ├── seq_01/
-#     └── ...
 
-for action in actions:
-    for sequence in range(no_sequences):
-        try:
-            os.makedirs(os.path.join(DATA_PATH, action, str(sequence)))
-        except:
-            pass
+# Create folders for each action sequence
+def create_folders():
+    for action in actions:
+        for sequence in range(no_sequences):
+            try:
+                os.makedirs(os.path.join(DATA_PATH, action, str(sequence)))
+            except:
+                pass
+
 
 # to capture the video by frames we have set up a loop
 
-cap = cv2.VideoCapture(0)
-with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
-    for action in actions:
-        for sequence in range(no_sequences):
-            for frame_num in range(sequence_length):
-                # Read the frame
-                ret, frame = cap.read()
-                if not ret:
-                    break
+def capture_keypoints():
+    cap = cv2.VideoCapture(0)
+    with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+        for action in actions:
+            for sequence in range(no_sequences):
+                for frame_num in range(sequence_length):
+                    ret, frame = cap.read()
+                    if not ret:
+                        break
 
-                # Make detection
-                image, results = mediapipe_detection(frame, holistic)
-                print(results)
-                draw_landmarks(image, results)
+                    image, results = mediapipe_detection(frame, holistic)
+                    print(results)
+                    draw_landmarks(image, results)
 
-                # Apply collection break for hand movement break
-                if frame_num == 0:
-                    cv2.putText(image, 'STARTING COLLECTION', (120, 240),
-                                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4, cv2.LINE_AA)
-                    cv2.putText(image, 'Collecting frames for {} video number {}'.format(action, sequence), (15, 12),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
-                    # Pause for 2 seconds
-                    cv2.waitKey(2000)
+                    if frame_num == 0:
+                        cv2.putText(image, 'STARTING COLLECTION', (120, 240),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4, cv2.LINE_AA)
+                        cv2.putText(image, 'Collecting frames for {} video number {}'.format(action, sequence),
+                                    (15, 12),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
+                        cv2.waitKey(2000)
+                    else:
+                        cv2.putText(image, 'Collecting frames for {} video number {}'.format(action, sequence),
+                                    (15, 12),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
+
+                    # Uncomment if you want to save keypoints
+                    # keypoints = extract_keypoints(results)
+                    # npy_path = os.path.join(DATA_PATH, action, str(sequence), str(frame_num))
+                    # np.save(npy_path, keypoints)
+
+                    cv2.imshow('OpenCv Feed', image)
+
+                    if cv2.waitKey(10) & 0xFF == ord('q'):
+                        cap.release()
+                        cv2.destroyAllWindows()
+                        return
+
                 else:
-                    cv2.putText(image, 'Collecting frames for {} video number {}'.format(action, sequence), (15, 12),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
-
-                # keypoints = extract_keypoints(results)
-                # npy_path = os.path.join(DATA_PATH, action, str(sequence), str(frame_num))
-                # np.save(npy_path, keypoints)
-                # Show the popup window and the img keeps on processing till while is true
-                cv2.imshow('OpenCv Feed', image)
-
-                # Quit the pop-up as you press 'q'
-                if cv2.waitKey(10) & 0xFF == ord('q'):
-                    cap.release()
-                    cv2.destroyAllWindows()
-                    break
+                    continue
+                break
             else:
                 continue
             break
-        else:
-            continue
-        break
+    cap.release()
+    cv2.destroyAllWindows()
 
-result_test = extract_keypoints(results)
-np.save('0', result_test)
-np.load('0.npy')
+
+if __name__ == "__main__":
+    create_folders()
+    capture_keypoints()
+
+# result_test = extract_keypoints(results)
+# np.save('0', result_test)
+# np.load('0.npy')
+
