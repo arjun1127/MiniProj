@@ -69,7 +69,7 @@ def extract_keypoints(results):
 # Path for exported data from the numpy array
 DATA_PATH = os.path.join('MP_DATA')
 # Actions that we try to detect
-actions = np.array(['How are You', 'Im Fine', 'Hello', 'yes', 'ThankYou'])
+actions = np.array(['Again', 'Hello', 'Im fine', 'Practice', 'Sorry', 'Thankyou', 'Yes'])
 # Thirty videos worth of data
 no_sequences = 30
 # videos are going to be 30 frames in length
@@ -108,7 +108,7 @@ def capture_keypoints():
                         cv2.putText(image, 'Collecting frames for {} video number {}'.format(action, sequence),
                                     (15, 12),
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
-                        cv2.waitKey(2000)
+                        cv2.waitKey(100)
                     else:
                         cv2.putText(image, 'Collecting frames for {} video number {}'.format(action, sequence),
                                     (15, 12),
@@ -141,6 +141,4 @@ if __name__ == "__main__":
     capture_keypoints()
 
 # result_test = extract_keypoints(results)
-# np.save('0', result_test)
-# np.load('0.npy')
 

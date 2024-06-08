@@ -26,3 +26,82 @@ Why are we using this specific neural network that is media pipe + LSTM layers
  we have used categorical_cross-entropy loss function because we have multi class classification model so
  =>in case we are using regression with neural network we would be using mean-square root loss function
     if binary class classification then we would use binary cross-entropy
+
+=> in summary as u can see the total parameters is 596,741 this is indeed very less when compared to other NN combi
+
+=>to go to tensorboard
+=>      0. go to cmd
+=>      1. go to logs->train
+=>      2. dir
+=>      3. enter -> tensorboard --logdir=.
+
+
+TensorBoard Callback
+
+python
+Copy code
+
+tb_callback = TensorBoard(log_dir=log_dir)
+TensorBoard: TensorBoard is a tool for visualizing metrics during training. Here, a TensorBoard callback is created with the directory specified by log_dir to store the logs.
+Model Definition
+
+python
+Copy code
+
+model = Sequential()
+
+Sequential Model: The Sequential model is a linear stack of layers. You can add layers to it one by one.
+Adding LSTM Layers
+
+python
+Copy code
+
+model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(30, 1662)))
+LSTM Layer: Adds a Long Short-Term Memory (LSTM) layer with 64 units.
+return_sequences=True: This ensures that the LSTM layer returns the full sequence of outputs for each input sequence, not just the output at the last time step.
+activation='relu': ReLU (Rectified Linear Unit) activation function is applied.
+input_shape=(30, 1662): The input shape specifies the number of time steps (30) and the number of features per time step (1662).
+
+python
+Copy code
+
+model.add(LSTM(128, return_sequences=True, activation='relu'))
+
+LSTM Layer: Adds another LSTM layer with 128 units, also returning the full sequence of outputs for each input sequence.
+
+python
+Copy code
+
+model.add(LSTM(64, return_sequences=False, activation='relu'))
+
+LSTM Layer: Adds a third LSTM layer with 64 units. This time, return_sequences=False, which means this layer will only return the output at the last time step.
+Adding Dense Layers
+
+
+model.add(Dense(64, activation='relu'))
+
+Dense Layer: A fully connected layer with 64 units and ReLU activation.
+python
+Copy code
+model.add(Dense(32, activation='relu'))
+Dense Layer: Another fully connected layer with 32 units and ReLU activation.
+python
+Copy code
+model.add(Dense(Main.actions.shape[0], activation='softmax'))
+Dense Layer: The output layer, where Main.actions.shape[0] indicates the number of output classes. The softmax activation function is used to convert the outputs into a probability distribution over the classes.
+Compiling the Model
+python
+Copy code
+model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
+optimizer='Adam': Uses the Adam optimizer, which is a popular choice for training neural networks.
+loss='categorical_crossentropy': Uses categorical cross-entropy loss, which is appropriate for multi-class classification tasks where the labels are one-hot encoded.
+metrics=['categorical_accuracy']: Uses categorical accuracy as a metric to evaluate the performance of the model.
+Summary
+LSTM Layers: The model starts with three LSTM layers. The first two LSTM layers return sequences to feed into the next LSTM layer, while the third LSTM layer only returns the output at the last time step.
+Dense Layers: Following the LSTM layers, there are two fully connected (Dense) layers with ReLU activation, followed by a final Dense layer with a softmax activation for multi-class classification.
+Compilation: The model is compiled using the Adam optimizer, categorical cross-entropy loss, and categorical accuracy as the metric.
+This architecture is suitable for sequence classification tasks, where the input sequences have a fixed length of 30 time steps and each time step has 1662 features. The model outputs probabilities for each of the classes defined in Main.actions.
+
+Confusion Matrix Allows us to detect what is True positive and true negative and , similarly
+False positive and false negative
+
